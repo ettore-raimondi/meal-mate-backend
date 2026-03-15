@@ -1,5 +1,5 @@
 from .base import Base
-from .resturant import Resturant
+from .restaurant import Restaurant
 from django.db import models
 from django.conf import settings
 
@@ -9,6 +9,6 @@ class FoodRun(Base):
         on_delete=models.CASCADE,
         related_name="organized_food_runs"
     )
-    resturant = models.ForeignKey(Resturant, on_delete=models.CASCADE, related_name="food_runs")
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name="food_runs")
     description = models.TextField(blank=True)
     deadline = models.DateTimeField(blank=False)

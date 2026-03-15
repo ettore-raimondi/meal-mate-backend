@@ -9,6 +9,9 @@ djangorestframework = "*"
 djangorestframework-simplejwt = "*"
 django-cors-headers = "*"
 requests = "*"
+google-genai = "*"
+beautifulsoup4 = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

@@ -2,14 +2,13 @@ from django.conf import settings
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status, viewsets
-from rest_framework import viewsets
 import requests
-from api.models import Resturant
-from api.serializers import ResturantSerializer
+from api.models import Restaurant
+from api.serializers import RestaurantSerializer
 
-class ResturantsViewSet(viewsets.ModelViewSet):
-    queryset = Resturant.objects.all()
-    serializer_class = ResturantSerializer
+class RestaurantsViewSet(viewsets.ModelViewSet):
+    queryset = Restaurant.objects.all()
+    serializer_class = RestaurantSerializer
 
     @action(detail=False, methods=["get"], url_path="places")
     def get_places(self, request):
@@ -49,17 +48,20 @@ class ResturantsViewSet(viewsets.ModelViewSet):
         })
 
         result = [
-            {
-                "google_places_id": place.get("id"),
-                "name": place.get("displayName").get("text"),
-                "address": place.get("postalAddress", {}).get("streetAddress"),
-                "phone_number": place.get("internationalPhoneNumber"),
-                "website_uri": place.get("websiteUri"),
-            }
+            Restaurant(
+                google_places_id=place.get("id"),
+                name=place.get("displayName").get("text"),
+                address=place.get("postalAddress", {}).get("streetAddress"),
+                phone_number=place.get("internationalPhoneNumber"),
+                website_url=place.get("websiteUri"),
+            )
             for place in response.json().get("places", [])
         ]
 
-        return Response(result, status=status.HTTP_200_OK)
+        # Django does not actually know how to transform this list of Restaurant objects to JSON, so we need to serialize it first
+        serializedData = RestaurantSerializer(result, many=True).data
+
+        return Response(serializedData, status=status.HTTP_200_OK)
         
 
         
