@@ -1,3 +1,5 @@
+import uuid
+
 from django.conf import settings
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -47,8 +49,12 @@ class RestaurantsViewSet(viewsets.ModelViewSet):
             'X-Goog-FieldMask': ','.join(fields)
         })
 
+        if response.status_code != 200:
+            return Response({"error": "Failed to fetch places from Google Places API"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         result = [
             Restaurant(
+                id=abs(hash(place.get("id"))), # We need to generate a unique id for each restaurant since these restaurants don't actually exist in our database
                 google_places_id=place.get("id"),
                 name=place.get("displayName").get("text"),
                 address=place.get("postalAddress", {}).get("streetAddress"),
